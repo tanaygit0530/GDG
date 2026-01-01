@@ -4,15 +4,19 @@ import { useState, useRef, FormEvent } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Upload, Scan, FileImage } from 'lucide-react';
+import { Upload, Scan, FileImage, Shield, Clock, CheckCircle, AlertTriangle } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export default function ScanPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [extractProgress, setExtractProgress] = useState(0);
+  const [analyzeProgress, setAnalyzeProgress] = useState(0);
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+  const [currentStep, setCurrentStep] = useState<'upload' | 'extract' | 'analyze' | 'complete' | 'idle'>('idle');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -27,6 +31,7 @@ export default function ScanPage() {
       // Reset previous results
       setResult(null);
       setError(null);
+      setCurrentStep('idle');
     }
   };
 
@@ -47,6 +52,7 @@ export default function ScanPage() {
       // Reset previous results
       setResult(null);
       setError(null);
+      setCurrentStep('idle');
     }
   };
 
@@ -60,8 +66,29 @@ export default function ScanPage() {
     
     setIsUploading(true);
     setError(null);
+    setCurrentStep('upload');
     
     try {
+      // Simulate upload progress
+      for (let i = 0; i <= 100; i += 10) {
+        await new Promise(resolve => setTimeout(resolve, 50));
+        setUploadProgress(i);
+      }
+      
+      setCurrentStep('extract');
+      // Simulate extraction progress
+      for (let i = 0; i <= 100; i += 10) {
+        await new Promise(resolve => setTimeout(resolve, 50));
+        setExtractProgress(i);
+      }
+      
+      setCurrentStep('analyze');
+      // Simulate analysis progress
+      for (let i = 0; i <= 100; i += 10) {
+        await new Promise(resolve => setTimeout(resolve, 50));
+        setAnalyzeProgress(i);
+      }
+      
       const formData = new FormData();
       formData.append('image', selectedFile);
       
@@ -76,11 +103,16 @@ export default function ScanPage() {
       
       const data = await response.json();
       setResult(data);
+      setCurrentStep('complete');
     } catch (err) {
       console.error('Upload error:', err);
       setError('Failed to analyze the image. Please try again.');
     } finally {
       setIsUploading(false);
+      // Reset progress
+      setUploadProgress(0);
+      setExtractProgress(0);
+      setAnalyzeProgress(0);
     }
   };
 
@@ -95,6 +127,21 @@ export default function ScanPage() {
             Upload a photo of a food product label to analyze its ingredients
           </p>
         </header>
+
+        {/* Privacy Notice Card */}
+        <Card className="mb-8 border-green-200 bg-green-50">
+          <CardContent className="p-6">
+            <div className="flex items-start">
+              <Shield className="h-6 w-6 text-green-600 mt-0.5 mr-3 flex-shrink-0" />
+              <div>
+                <h3 className="font-semibold text-green-800 mb-1">Privacy First</h3>
+                <p className="text-green-700">
+                  Image is processed once and permanently deleted. No images are stored on our servers.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         <Card className="mb-8">
           <CardHeader>
@@ -156,7 +203,10 @@ export default function ScanPage() {
                   {isUploading ? (
                     <>
                       <Scan className="mr-2 h-4 w-4 animate-spin" />
-                      Analyzing...
+                      {currentStep === 'upload' && 'Uploading...'}
+                      {currentStep === 'extract' && 'Extracting ingredients...'}
+                      {currentStep === 'analyze' && 'Analyzing ingredients...'}
+                      {currentStep === 'complete' && 'Complete!'}
                     </>
                   ) : (
                     <>
@@ -184,6 +234,37 @@ export default function ScanPage() {
                 </div>
               )}
             </form>
+            
+            {/* Progress indicators */}
+            {isUploading && (
+              <div className="mt-6 space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium flex items-center">
+                    {currentStep === 'upload' && <Clock className="mr-2 h-4 w-4" />}
+                    {currentStep === 'extract' && <FileImage className="mr-2 h-4 w-4" />}
+                    {currentStep === 'analyze' && <Scan className="mr-2 h-4 w-4" />}
+                    {currentStep === 'upload' && 'Uploading image'}
+                    {currentStep === 'extract' && 'Extracting ingredients'}
+                    {currentStep === 'analyze' && 'Analyzing ingredients'}
+                  </span>
+                  <span className="text-sm text-gray-500">
+                    {currentStep === 'upload' && `${uploadProgress}%`}
+                    {currentStep === 'extract' && `${extractProgress}%`}
+                    {currentStep === 'analyze' && `${analyzeProgress}%`}
+                  </span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div 
+                    className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+                    style={{ 
+                      width: currentStep === 'upload' ? `${uploadProgress}%` : 
+                             currentStep === 'extract' ? `${extractProgress}%` : 
+                             `${analyzeProgress}%` 
+                    }}
+                  ></div>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -196,9 +277,12 @@ export default function ScanPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
+              <div className="space-y-6">
                 <div>
-                  <h3 className="font-medium mb-2">Extracted Text:</h3>
+                  <h3 className="font-medium mb-2 flex items-center">
+                    <FileImage className="mr-2 h-4 w-4" />
+                    Extracted Text:
+                  </h3>
                   <div className="bg-gray-50 p-4 rounded-lg">
                     <p className="text-gray-700">{result.originalText.join(', ')}</p>
                   </div>
@@ -206,10 +290,13 @@ export default function ScanPage() {
                 
                 {result.ingredients.length > 0 ? (
                   <div>
-                    <h3 className="font-medium mb-2">Identified Ingredients:</h3>
+                    <h3 className="font-medium mb-2 flex items-center">
+                      <CheckCircle className="mr-2 h-4 w-4" />
+                      Identified Ingredients:
+                    </h3>
                     <div className="grid gap-4">
                       {result.ingredients.map((ingredient: any, index: number) => (
-                        <div key={index} className="border rounded-lg p-4 bg-white">
+                        <div key={index} className="border rounded-lg p-4 bg-white hover:shadow-md transition-shadow">
                           <div className="flex justify-between items-start">
                             <h4 className="text-lg font-semibold">{ingredient.name}</h4>
                             <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">
@@ -217,23 +304,45 @@ export default function ScanPage() {
                             </span>
                           </div>
                           <p className="text-gray-600 text-sm mt-1">{ingredient.safetyExplanation}</p>
-                          <div className="mt-2 flex flex-wrap gap-2">
-                            {ingredient.aliases.map((alias: string, aliasIndex: number) => (
-                              <span 
-                                key={aliasIndex} 
-                                className="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded"
-                              >
-                                {alias}
-                              </span>
-                            ))}
-                            {ingredient.eNumbers.map((eNum: string, eIndex: number) => (
-                              <span 
-                                key={eIndex} 
-                                className="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded"
-                              >
-                                {eNum}
-                              </span>
-                            ))}
+                          <div className="mt-3 flex flex-wrap gap-2">
+                            {ingredient.aliases.length > 0 && (
+                              <div className="w-full">
+                                <p className="text-xs text-gray-500 mb-1">Aliases:</p>
+                                <div className="flex flex-wrap gap-1">
+                                  {ingredient.aliases.map((alias: string, aliasIndex: number) => (
+                                    <span 
+                                      key={aliasIndex} 
+                                      className="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded"
+                                    >
+                                      {alias}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                            {ingredient.eNumbers.length > 0 && (
+                              <div className="w-full mt-2">
+                                <p className="text-xs text-gray-500 mb-1">E-Numbers:</p>
+                                <div className="flex flex-wrap gap-1">
+                                  {ingredient.eNumbers.map((eNum: string, eIndex: number) => (
+                                    <span 
+                                      key={eIndex} 
+                                      className="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded"
+                                    >
+                                      {eNum}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                          <div className="mt-3">
+                            <button 
+                              className="text-blue-600 text-sm font-medium hover:underline"
+                              onClick={() => window.location.href = `/ingredient/${encodeURIComponent(ingredient.name)}`}
+                            >
+                              View detailed information →
+                            </button>
                           </div>
                         </div>
                       ))}
@@ -241,6 +350,7 @@ export default function ScanPage() {
                   </div>
                 ) : (
                   <div className="text-center py-8">
+                    <AlertTriangle className="h-12 w-12 text-yellow-500 mx-auto mb-4" />
                     <p className="text-gray-600">
                       No known ingredients were identified in the product. 
                       The ingredients in the product may not be in our database.
