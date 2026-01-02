@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+
+# Environment variables
+.env
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor and IDE specific files
+.vs/
+*.sublime-project
+*.sublime-workspace
+*.settings/
+*.tmproj
+
+# Project specific ignores
+# Ignore the backend and frontend env files (but not the example files)
+backend/.env
+frontend/.env
+
+# Ignore compiled outputs that might be generated at root
+dist/
+build/
+out/
