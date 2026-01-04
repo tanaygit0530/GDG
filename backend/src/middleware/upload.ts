@@ -1,13 +1,20 @@
 import * as path from 'path';
+import * as fs from 'fs';
 import { deleteTempFile } from '../services/ocrService';
 
 const multer = require('multer');
+
+// Create temp directory if it doesn't exist
+const tempDir = path.join(__dirname, '../../temp');
+if (!fs.existsSync(tempDir)) {
+  fs.mkdirSync(tempDir, { recursive: true });
+}
 
 // Configure multer for temporary file storage
 const storage = multer.diskStorage({
   destination: function (req: Express.Request, file: Express.Multer.File, cb: (error: Error | null, destination: string) => void) {
     // Create a temporary directory for uploads
-    cb(null, path.join(__dirname, '../../temp'));
+    cb(null, tempDir);
   },
   filename: function (req: Express.Request, file: Express.Multer.File, cb: (error: Error | null, filename: string) => void) {
     // Generate a unique filename to prevent conflicts

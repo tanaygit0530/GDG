@@ -1,11 +1,14 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.IngredientIntelligenceEngine = void 0;
-const ingredientDatabase_1 = require("../data/ingredientDatabase");
+const Ingredient_1 = __importDefault(require("../models/Ingredient"));
 class IngredientIntelligenceEngine {
     static calculateSafetyScore(ingredient, context) {
-        let score = ingredient.safetyScore;
-        let explanation = ingredient.safetyExplanation;
+        let score = ingredient.safetyScore || 5;
+        let explanation = ingredient.safetyExplanation || 'Safety information not available.';
         if (context?.ageGroup === 'child' && ingredient.ageConsiderations?.children) {
             score = Math.max(1, score - 2);
             explanation += ` Note for children: ${ingredient.ageConsiderations.children}`;
@@ -45,36 +48,44 @@ class IngredientIntelligenceEngine {
         score = Math.max(1, Math.min(10, score));
         return { score: Math.round(score), explanation };
     }
-    static normalizeIngredientName(name) {
+    static async normalizeIngredientName(name) {
         const normalizedName = name.toLowerCase().trim();
         const matches = [];
-        for (const ingredient of ingredientDatabase_1.ingredientDatabase) {
-            if (ingredient.name.toLowerCase() === normalizedName ||
-                ingredient.scientificName?.toLowerCase() === normalizedName ||
-                ingredient.aliases.some(alias => alias.toLowerCase() === normalizedName) ||
-                ingredient.eNumbers.some(eNum => eNum.toLowerCase() === normalizedName)) {
-                matches.push(ingredient.name);
-            }
-        }
+        const ingredients = await Ingredient_1.default.find({
+            $or: [
+                { name: { $regex: new RegExp(normalizedName, 'i') } },
+                { scientificName: { $regex: new RegExp(normalizedName, 'i') } },
+                { aliases: { $in: [new RegExp(normalizedName, 'i')] } },
+                { eNumbers: { $in: [new RegExp(normalizedName, 'i')] } }
+            ]
+        });
+        ingredients.forEach(ingredient => {
+            matches.push(ingredient.name);
+        });
         if (matches.length === 0) {
-            for (const ingredient of ingredientDatabase_1.ingredientDatabase) {
-                if (ingredient.name.toLowerCase().includes(normalizedName) ||
-                    normalizedName.includes(ingredient.name.toLowerCase()) ||
-                    ingredient.aliases.some(alias => alias.toLowerCase().includes(normalizedName) ||
-                        normalizedName.includes(alias.toLowerCase()))) {
-                    matches.push(ingredient.name);
-                }
-            }
+            const partialMatches = await Ingredient_1.default.find({
+                $or: [
+                    { name: { $regex: new RegExp(normalizedName, 'i') } },
+                    { aliases: { $in: [new RegExp(`.*${normalizedName}.*`, 'i')] } }
+                ]
+            });
+            partialMatches.forEach(ingredient => {
+                matches.push(ingredient.name);
+            });
         }
         return Array.from(new Set(matches));
     }
     static getEducationalContext(ingredient, context) {
         let educationalContext = `About ${ingredient.name}: `;
-        educationalContext += `This ingredient is ${ingredient.origin.toLowerCase()}. `;
-        if (ingredient.purpose.length > 0) {
-            educationalContext += `It is commonly used as: ${ingredient.purpose.join(', ')}. `;
+        educationalContext += `This ingredient is ${(ingredient.origin || ingredient.origin || 'unknown').toLowerCase()}. `;
+        const purposeInfo = ingredient.purpose || ingredient.why_used;
+        if (purposeInfo && Array.isArray(purposeInfo) && purposeInfo.length > 0) {
+            educationalContext += `It is commonly used as: ${purposeInfo.join(', ')}. `;
         }
-        const aliases = [...ingredient.aliases, ...ingredient.eNumbers].filter(alias => alias.toLowerCase() !== ingredient.name.toLowerCase());
+        else if (typeof purposeInfo === 'string') {
+            educationalContext += `It is commonly used as: ${purposeInfo}. `;
+        }
+        const aliases = [...(ingredient.aliases || []), ...(ingredient.eNumbers || [])].filter(alias => alias.toLowerCase() !== ingredient.name.toLowerCase());
         if (aliases.length > 0) {
             educationalContext += `It may also be listed as: ${aliases.join(', ')}. `;
         }

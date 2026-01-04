@@ -1,9 +1,9 @@
-import { Ingredient } from '../models/Ingredient';
+import { IIngredient } from '../models/Ingredient';
 export declare class IngredientService {
     static getIngredientByName(name: string, context?: {
         ageGroup?: 'child' | 'adult' | 'elderly';
         healthConditions?: string[];
         consumptionFrequency?: 'daily' | 'weekly' | 'occasional';
-    }): Promise<Ingredient | null>;
+    }): Promise<IIngredient | null>;
 }
 //# sourceMappingURL=ingredientService.d.ts.map

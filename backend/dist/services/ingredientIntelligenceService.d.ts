@@ -1,6 +1,6 @@
-import { Ingredient } from '../models/Ingredient';
+import { IIngredient } from '../models/Ingredient';
 export declare class IngredientIntelligenceEngine {
-    static calculateSafetyScore(ingredient: Ingredient, context?: {
+    static calculateSafetyScore(ingredient: IIngredient, context?: {
         ageGroup?: 'child' | 'adult' | 'elderly';
         healthConditions?: string[];
         consumptionFrequency?: 'daily' | 'weekly' | 'occasional';
@@ -8,8 +8,8 @@ export declare class IngredientIntelligenceEngine {
         score: number;
         explanation: string;
     };
-    static normalizeIngredientName(name: string): string[];
-    static getEducationalContext(ingredient: Ingredient, context?: {
+    static normalizeIngredientName(name: string): Promise<string[]>;
+    static getEducationalContext(ingredient: IIngredient, context?: {
         ageGroup?: 'child' | 'adult' | 'elderly';
         healthConditions?: string[];
     }): string;

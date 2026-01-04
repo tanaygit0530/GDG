@@ -3,6 +3,8 @@ import { IngredientService } from '../services/ingredientService';
 import { analyzeIngredientsFromText, deleteTempFile } from '../services/ocrService';
 
 export const processImageForIngredients = async (req: Request, res: Response): Promise<void> => {
+  let fileProcessed = false;
+  
   try {
     if (!req.file) {
       res.status(400).json({ message: 'No image file provided' });
@@ -27,6 +29,7 @@ export const processImageForIngredients = async (req: Request, res: Response): P
     try {
       await deleteTempFile(req.file.path);
       console.log(`Temporary file ${req.file.path} deleted successfully`);
+      fileProcessed = true;
     } catch (error) {
       console.error('Error deleting temporary file:', error);
     }
@@ -38,7 +41,7 @@ export const processImageForIngredients = async (req: Request, res: Response): P
     return;
   } catch (error) {
     // Delete the temporary file even if processing fails
-    if (req.file) {
+    if (req.file && !fileProcessed) {
       try {
         await deleteTempFile(req.file.path);
         console.log(`Temporary file ${req.file.path} deleted after error`);

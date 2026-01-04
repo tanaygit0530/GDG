@@ -4,6 +4,7 @@ exports.ingredientDatabase = void 0;
 exports.ingredientDatabase = [
     {
         name: 'Sugar',
+        primary_name: 'Sugar',
         scientificName: 'Sucrose',
         origin: 'Plant-based',
         purpose: ['Sweetener', 'Preservative', 'Texture enhancer'],
@@ -18,10 +19,15 @@ exports.ingredientDatabase = [
             diabetes: 'Individuals managing blood sugar levels should consume products containing sugar cautiously as it can cause rapid increases in blood glucose.',
             bloodPressure: 'High sugar intake may contribute to weight gain, which can affect blood pressure management.'
         },
-        disclaimer: 'Information provided for educational purposes only. Not intended as medical advice.'
+        disclaimer: 'Information provided for educational purposes only. Not intended as medical advice.',
+        functional_class: 'Sweetener',
+        why_used: 'Provides sweetness and enhances flavor',
+        codex_status: 'permitted_with_limits',
+        adi_status: 'specified'
     },
     {
         name: 'High Fructose Corn Syrup',
+        primary_name: 'High Fructose Corn Syrup',
         scientificName: 'Glucose-Fructose',
         origin: 'Synthetic',
         purpose: ['Sweetener', 'Preservative', 'Texture enhancer'],
@@ -36,10 +42,15 @@ exports.ingredientDatabase = [
             diabetes: 'Can cause rapid increases in blood glucose levels. Individuals managing blood sugar should consume cautiously.',
             digestive: 'Some individuals may experience digestive discomfort with excessive consumption.'
         },
-        disclaimer: 'Information provided for educational purposes only. Not intended as medical advice.'
+        disclaimer: 'Information provided for educational purposes only. Not intended as medical advice.',
+        functional_class: 'Sweetener',
+        why_used: 'Provides sweetness and extends shelf life',
+        codex_status: 'permitted_with_limits',
+        adi_status: 'specified'
     },
     {
         name: 'Aspartame',
+        primary_name: 'Aspartame',
         origin: 'Synthetic',
         purpose: ['Artificial sweetener', 'Calorie reducer'],
         aliases: ['NutraSweet', 'Equal', 'AminoSweet'],
@@ -52,10 +63,15 @@ exports.ingredientDatabase = [
         healthConditions: {
             diabetes: 'Does not raise blood glucose levels, making it suitable for those managing diabetes.'
         },
-        disclaimer: 'Information provided for educational purposes only. Not intended as medical advice. People with PKU must avoid aspartame.'
+        disclaimer: 'Information provided for educational purposes only. Not intended as medical advice. People with PKU must avoid aspartame.',
+        functional_class: 'Sweetener',
+        why_used: 'Provides intense sweetness without calories',
+        codex_status: 'permitted_with_limits',
+        adi_status: 'specified'
     },
     {
         name: 'Sodium Benzoate',
+        primary_name: 'Sodium Benzoate',
         origin: 'Synthetic',
         purpose: ['Preservative', 'Antimicrobial agent'],
         aliases: ['benzoic acid sodium salt'],
@@ -68,10 +84,15 @@ exports.ingredientDatabase = [
         healthConditions: {
             digestive: 'In sensitive individuals, may cause mild digestive upset.'
         },
-        disclaimer: 'Information provided for educational purposes only. Not intended as medical advice.'
+        disclaimer: 'Information provided for educational purposes only. Not intended as medical advice.',
+        functional_class: 'Preservative',
+        why_used: 'Prevents microbial growth and extends shelf life',
+        codex_status: 'permitted_with_limits',
+        adi_status: 'specified'
     },
     {
         name: 'Tartrazine',
+        primary_name: 'Tartrazine',
         origin: 'Synthetic',
         purpose: ['Food coloring', 'Yellow colorant'],
         aliases: ['FD&C Yellow No. 5', 'E102'],
@@ -84,10 +105,15 @@ exports.ingredientDatabase = [
         healthConditions: {
             digestive: 'May cause digestive upset in sensitive individuals.'
         },
-        disclaimer: 'Information provided for educational purposes only. Not intended as medical advice.'
+        disclaimer: 'Information provided for educational purposes only. Not intended as medical advice.',
+        functional_class: 'Colour',
+        why_used: 'Provides lemon-yellow colour',
+        codex_status: 'permitted_with_limits',
+        adi_status: 'specified'
     },
     {
         name: 'Caffeine',
+        primary_name: 'Caffeine',
         scientificName: '1,3,7-Trimethylxanthine',
         origin: 'Plant-based',
         purpose: ['Stimulant', 'Flavor enhancer'],
@@ -101,10 +127,15 @@ exports.ingredientDatabase = [
         healthConditions: {
             bloodPressure: 'May cause temporary increases in blood pressure in sensitive individuals.'
         },
-        disclaimer: 'Information provided for educational purposes only. Not intended as medical advice.'
+        disclaimer: 'Information provided for educational purposes only. Not intended as medical advice.',
+        functional_class: 'Stimulant',
+        why_used: 'Provides stimulant effects and enhances alertness',
+        codex_status: 'permitted_with_limits',
+        adi_status: 'specified'
     },
     {
         name: 'Monosodium Glutamate',
+        primary_name: 'Monosodium Glutamate',
         scientificName: 'Sodium glutamate',
         origin: 'Synthetic',
         purpose: ['Flavor enhancer', 'Umami taste'],
@@ -118,10 +149,15 @@ exports.ingredientDatabase = [
         healthConditions: {
             digestive: 'Some individuals may be sensitive to MSG and experience mild symptoms.'
         },
-        disclaimer: 'Information provided for educational purposes only. Not intended as medical advice.'
+        disclaimer: 'Information provided for educational purposes only. Not intended as medical advice.',
+        functional_class: 'Flavor enhancer',
+        why_used: 'Provides umami taste and enhances flavor',
+        codex_status: 'permitted',
+        adi_status: 'not_specified'
     },
     {
         name: 'Sorbitol',
+        primary_name: 'Sorbitol',
         origin: 'Plant-based',
         purpose: ['Sweetener', 'Humectant', 'Texture enhancer'],
         aliases: ['glucitol', 'E967'],
@@ -134,7 +170,11 @@ exports.ingredientDatabase = [
         healthConditions: {
             digestive: 'May cause digestive upset and diarrhea in sensitive individuals or when consumed in large amounts.'
         },
-        disclaimer: 'Information provided for educational purposes only. Not intended as medical advice.'
+        disclaimer: 'Information provided for educational purposes only. Not intended as medical advice.',
+        functional_class: 'Sweetener',
+        why_used: 'Provides sweetness with fewer calories and acts as humectant',
+        codex_status: 'permitted',
+        adi_status: 'not_specified'
     }
 ];
 //# sourceMappingURL=ingredientDatabase.js.map

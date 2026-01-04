@@ -12,6 +12,11 @@ const model = genAI.getGenerativeModel({ model: 'gemini-pro-vision' });
  */
 export const analyzeIngredientsFromText = async (imagePath: string): Promise<string[]> => {
   try {
+    // Check if the file exists before reading
+    if (!fs.existsSync(imagePath)) {
+      throw new Error(`Image file does not exist: ${imagePath}`);
+    }
+    
     // Read the image file
     const imageBuffer = fs.readFileSync(imagePath);
     const imageBase64 = imageBuffer.toString('base64');

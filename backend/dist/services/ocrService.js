@@ -41,6 +41,9 @@ const genAI = new generative_ai_1.GoogleGenerativeAI(process.env.GEMINI_API_KEY 
 const model = genAI.getGenerativeModel({ model: 'gemini-pro-vision' });
 const analyzeIngredientsFromText = async (imagePath) => {
     try {
+        if (!fs.existsSync(imagePath)) {
+            throw new Error(`Image file does not exist: ${imagePath}`);
+        }
         const imageBuffer = fs.readFileSync(imagePath);
         const imageBase64 = imageBuffer.toString('base64');
         const prompt = `Analyze this food product label image and extract the ingredient list. 

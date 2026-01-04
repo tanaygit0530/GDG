@@ -4,6 +4,7 @@ exports.processImageForIngredients = void 0;
 const ingredientService_1 = require("../services/ingredientService");
 const ocrService_1 = require("../services/ocrService");
 const processImageForIngredients = async (req, res) => {
+    let fileProcessed = false;
     try {
         if (!req.file) {
             res.status(400).json({ message: 'No image file provided' });
@@ -18,6 +19,7 @@ const processImageForIngredients = async (req, res) => {
         try {
             await (0, ocrService_1.deleteTempFile)(req.file.path);
             console.log(`Temporary file ${req.file.path} deleted successfully`);
+            fileProcessed = true;
         }
         catch (error) {
             console.error('Error deleting temporary file:', error);
@@ -29,7 +31,7 @@ const processImageForIngredients = async (req, res) => {
         return;
     }
     catch (error) {
-        if (req.file) {
+        if (req.file && !fileProcessed) {
             try {
                 await (0, ocrService_1.deleteTempFile)(req.file.path);
                 console.log(`Temporary file ${req.file.path} deleted after error`);
