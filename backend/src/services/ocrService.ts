@@ -26,6 +26,12 @@ export const analyzeIngredientsFromText = async (imagePath: string): Promise<str
       ];
     }
     
+    // Check if the file exists before trying to read it
+    if (!fs.existsSync(imagePath)) {
+      console.error(`Image file does not exist at path: ${imagePath}`);
+      throw new Error(`Image file does not exist at path: ${imagePath}`);
+    }
+    
     // Read the image file
     const imageBuffer = fs.readFileSync(imagePath);
     const imageBase64 = imageBuffer.toString('base64');

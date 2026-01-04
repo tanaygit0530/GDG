@@ -39,7 +39,12 @@ const ocrService_1 = require("../services/ocrService");
 const multer = require('multer');
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, path.join(__dirname, '../../temp'));
+        const tempPath = path.join(__dirname, '../../temp');
+        const fs = require('fs');
+        if (!fs.existsSync(tempPath)) {
+            fs.mkdirSync(tempPath, { recursive: true });
+        }
+        cb(null, tempPath);
     },
     filename: function (req, file, cb) {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
@@ -54,7 +59,7 @@ const fileFilter = (req, file, cb) => {
         cb(new Error('Only image files are allowed!'), false);
     }
 };
-exports.upload = multer.default({
+exports.upload = multer({
     storage: storage,
     fileFilter: fileFilter,
     limits: {

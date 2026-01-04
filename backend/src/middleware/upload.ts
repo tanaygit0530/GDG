@@ -7,7 +7,13 @@ const multer = require('multer');
 const storage = multer.diskStorage({
   destination: function (req: Express.Request, file: Express.Multer.File, cb: (error: Error | null, destination: string) => void) {
     // Create a temporary directory for uploads
-    cb(null, path.join(__dirname, '../../temp'));
+    const tempPath = path.join(__dirname, '../../temp');
+    // Ensure the temp directory exists
+    const fs = require('fs');
+    if (!fs.existsSync(tempPath)) {
+      fs.mkdirSync(tempPath, { recursive: true });
+    }
+    cb(null, tempPath);
   },
   filename: function (req: Express.Request, file: Express.Multer.File, cb: (error: Error | null, filename: string) => void) {
     // Generate a unique filename to prevent conflicts

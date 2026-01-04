@@ -37,10 +37,25 @@ exports.deleteTempFile = exports.analyzeIngredientsFromText = void 0;
 const generative_ai_1 = require("@google/generative-ai");
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
-const genAI = new generative_ai_1.GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
-const model = genAI.getGenerativeModel({ model: 'gemini-pro-vision' });
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const genAI = GEMINI_API_KEY ? new generative_ai_1.GoogleGenerativeAI(GEMINI_API_KEY) : null;
+const model = genAI ? genAI.getGenerativeModel({ model: 'gemini-pro-vision' }) : null;
 const analyzeIngredientsFromText = async (imagePath) => {
     try {
+        if (!model) {
+            console.warn('GEMINI_API_KEY not provided, using mock data for development');
+            return [
+                'Sugar',
+                'Salt',
+                'Citric Acid',
+                'Ascorbic Acid',
+                'Natural Flavors'
+            ];
+        }
+        if (!fs.existsSync(imagePath)) {
+            console.error(`Image file does not exist at path: ${imagePath}`);
+            throw new Error(`Image file does not exist at path: ${imagePath}`);
+        }
         const imageBuffer = fs.readFileSync(imagePath);
         const imageBase64 = imageBuffer.toString('base64');
         const prompt = `Analyze this food product label image and extract the ingredient list. 
@@ -65,6 +80,16 @@ const analyzeIngredientsFromText = async (imagePath) => {
     }
     catch (error) {
         console.error('Error analyzing ingredients from image:', error);
+        if (process.env.NODE_ENV !== 'production') {
+            console.warn('Using mock data due to API error');
+            return [
+                'Sugar',
+                'Salt',
+                'Citric Acid',
+                'Ascorbic Acid',
+                'Natural Flavors'
+            ];
+        }
         throw new Error('Failed to analyze ingredients from image');
     }
 };

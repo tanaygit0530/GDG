@@ -97,16 +97,34 @@ export default function ScanPage() {
         body: formData,
       });
       
-      if (!response.ok) {
-        throw new Error(`Server error: ${response.status}`);
+      let data;
+      try {
+        data = await response.json();
+      } catch (parseError) {
+        console.error('Failed to parse JSON response:', parseError);
+        throw new Error(`Invalid response format from server: ${response.status}`);
       }
       
-      const data = await response.json();
+      if (!response.ok) {
+        // Use the error message from the backend if available
+        const errorMessage = data.error || data.message || `Server error: ${response.status}`;
+        throw new Error(errorMessage);
+      }
+      
+      // Check if the backend indicated success in its response structure
+      if (data.success === false) {
+        // Use the error message from the backend
+        const errorMessage = data.error || data.message || 'OCR processing failed';
+        throw new Error(errorMessage);
+      }
+      
       setResult(data);
       setCurrentStep('complete');
     } catch (err) {
       console.error('Upload error:', err);
-      setError('Failed to analyze the image. Please try again.');
+      // Show specific error message if available
+      const errorMessage = err instanceof Error ? err.message : 'Failed to analyze the image. Please try again.';
+      setError(errorMessage);
     } finally {
       setIsUploading(false);
       // Reset progress
@@ -284,7 +302,7 @@ export default function ScanPage() {
                     Extracted Text:
                   </h3>
                   <div className="bg-gray-50 p-4 rounded-lg">
-                    <p className="text-gray-700">{result.originalText.join(', ')}</p>
+                    <p className="text-gray-700">{result.originalText && Array.isArray(result.originalText) ? result.originalText.join(', ') : result.originalText}</p>
                   </div>
                 </div>
                 
