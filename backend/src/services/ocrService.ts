@@ -2,8 +2,9 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import * as fs from 'fs';
 import * as path from 'path';
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
-const model = genAI.getGenerativeModel({ model: 'gemini-pro-vision' });
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const genAI = GEMINI_API_KEY ? new GoogleGenerativeAI(GEMINI_API_KEY) : null;
+const model = genAI ? genAI.getGenerativeModel({ model: 'gemini-pro-vision' }) : null;
 
 /**
  * Analyzes an image to extract ingredient information using Gemini API
@@ -12,6 +13,19 @@ const model = genAI.getGenerativeModel({ model: 'gemini-pro-vision' });
  */
 export const analyzeIngredientsFromText = async (imagePath: string): Promise<string[]> => {
   try {
+    // If no API key is provided, return mock data for development
+    if (!model) {
+      console.warn('GEMINI_API_KEY not provided, using mock data for development');
+      // Return some common ingredients as mock data
+      return [
+        'Sugar',
+        'Salt',
+        'Citric Acid',
+        'Ascorbic Acid',
+        'Natural Flavors'
+      ];
+    }
+    
     // Read the image file
     const imageBuffer = fs.readFileSync(imagePath);
     const imageBase64 = imageBuffer.toString('base64');
@@ -46,6 +60,19 @@ export const analyzeIngredientsFromText = async (imagePath: string): Promise<str
     return ingredients;
   } catch (error) {
     console.error('Error analyzing ingredients from image:', error);
+    
+    // If there's an error with the API, return mock data for development
+    if (process.env.NODE_ENV !== 'production') {
+      console.warn('Using mock data due to API error');
+      return [
+        'Sugar',
+        'Salt',
+        'Citric Acid',
+        'Ascorbic Acid',
+        'Natural Flavors'
+      ];
+    }
+    
     throw new Error('Failed to analyze ingredients from image');
   }
 };

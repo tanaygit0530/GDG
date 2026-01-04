@@ -43,7 +43,7 @@ async function getIngredient(name: string, context?: {
     if (context?.consumptionFrequency) searchParams.append('consumptionFrequency', context.consumptionFrequency);
     
     const queryString = searchParams.toString();
-    const url = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/ingredients/${encodeURIComponent(name)}${queryString ? '?' + queryString : ''}`;
+    const url = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001'}/api/ingredients/${encodeURIComponent(name)}${queryString ? '?' + queryString : ''}`;
     
     const res = await fetch(url);
     
@@ -67,9 +67,9 @@ export default async function IngredientPage({ params, searchParams }: {
 }) {
   // Parse context from search parameters
   const context = {
-    ageGroup: Array.isArray(searchParams.ageGroup) ? searchParams.ageGroup[0] : searchParams.ageGroup,
-    healthConditions: Array.isArray(searchParams.healthConditions) ? searchParams.healthConditions : [searchParams.healthConditions].filter(Boolean) as string[],
-    consumptionFrequency: Array.isArray(searchParams.consumptionFrequency) ? searchParams.consumptionFrequency[0] : searchParams.consumptionFrequency,
+    ageGroup: Array.isArray(searchParams.ageGroup) ? searchParams.ageGroup[0] : searchParams.ageGroup as string,
+    healthConditions: Array.isArray(searchParams.healthConditions) ? searchParams.healthConditions as string[] : searchParams.healthConditions ? [searchParams.healthConditions as string] : [],
+    consumptionFrequency: Array.isArray(searchParams.consumptionFrequency) ? searchParams.consumptionFrequency[0] : searchParams.consumptionFrequency as string,
   };
 
   const ingredient = await getIngredient(params.name, context);
